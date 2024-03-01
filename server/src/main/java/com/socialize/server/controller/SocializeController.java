@@ -1,16 +1,35 @@
 package com.socialize.server.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.socialize.server.dto.CreateUserDto;
+import com.socialize.server.dto.LoginUserDto;
+import com.socialize.server.model.User;
+import com.socialize.server.service.SocializeService;
+import com.socialize.server.service.SocializeServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class SocializeController {
+    private SocializeServiceImpl socializeService;
 
-    @GetMapping("/api/auth/check")
-    public String checking(){
-        return "Hello";
+   @Autowired
+    public SocializeController(SocializeServiceImpl socializeService){
+        this.socializeService = socializeService;
     }
 
+    @PostMapping("/api/auth/signup")
+    public ResponseEntity createAccount(@RequestBody CreateUserDto createUserDto){
+        return socializeService.createAccount(createUserDto);
+    }
+
+    @GetMapping("/api/auth/checkUsername/{userName}")
+    public ResponseEntity checkUserNameAvaibility(@PathVariable String userName){
+       return socializeService.checkUserNameAvaibility(userName);
+    }
+
+    @PostMapping("/api/auth/login")
+    public ResponseEntity<User> login(@RequestBody LoginUserDto loginUserDto){
+       return socializeService.login(loginUserDto);
+    }
 }

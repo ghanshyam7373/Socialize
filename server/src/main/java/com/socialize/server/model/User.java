@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.TimeZone;
 
 @Entity
 @Table(name = "User")
@@ -35,16 +36,12 @@ public class User {
     public User() {
     }
 
-    public User(String userName, String email, String password, List<Post> posts, List<Like> likes, Timestamp createdAt, Timestamp updatedAt, List<Follow> followers, List<Follow> following) {
+    public User(String userName, String email, String password, Timestamp createdAt, Timestamp updatedAt) {
         this.userName = userName;
         this.email = email;
         this.password = password;
-        this.posts = posts;
-        this.likes = likes;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.followers = followers;
-        this.following = following;
     }
 
     public Long getId() {

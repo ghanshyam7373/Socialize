@@ -1,9 +1,17 @@
-/** @type {import('tailwindcss').Config} */
-export default {
-  content: ["*"],
+module.exports = {
+  content: [
+    './src/**/*.{js,jsx,ts,tsx}',
+  ],
   theme: {
     extend: {},
+    fontFamily: {
+      'josefin' : ['Josefin sans', 'ui-sans-serif']
+    },
+    colors:{
+      'primary':'#FFA250'
+    }
   },
-  plugins: [],
+  plugins: [
+    require('flowbite/plugin')
+]
 }
-
