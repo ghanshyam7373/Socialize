@@ -1,5 +1,6 @@
 package com.socialize.server.service;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.socialize.server.dto.CreateUserDto;
 import com.socialize.server.dto.LoginUserDto;
 import com.socialize.server.model.User;
@@ -12,9 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.Optional;
-import java.util.TimeZone;
+import java.util.*;
 
 @Service
 public class SocializeServiceImpl implements SocializeService{
@@ -33,34 +32,52 @@ public class SocializeServiceImpl implements SocializeService{
 
     @Override
     public ResponseEntity createAccount(CreateUserDto createUserDto) {
-        List<User> checkEmail = userRepository.findByEmail(createUserDto.getEmail());
-        if(checkEmail.isEmpty()){
-            createUserDto.setPassword(passwordEncoder.encode(createUserDto.getPassword()));
-            User user = new User(createUserDto.getUserName(), createUserDto.getEmail(), createUserDto.getPassword(), new Timestamp(System.currentTimeMillis()),new Timestamp(System.currentTimeMillis()));
-            return new ResponseEntity(userRepository.save(user),HttpStatus.OK);
+
+        try {
+            List<User> checkEmail = userRepository.findByEmail(createUserDto.getEmail());
+            if(checkEmail.isEmpty()){
+                createUserDto.setPassword(passwordEncoder.encode(createUserDto.getPassword()));
+                User user = new User(createUserDto.getUserName(), createUserDto.getEmail(), createUserDto.getPassword(), new Timestamp(System.currentTimeMillis()),new Timestamp(System.currentTimeMillis()));
+                return new ResponseEntity(userRepository.save(user),HttpStatus.OK);
+            }
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
     public ResponseEntity checkUserNameAvaibility(String userName) {
-        List<User> checkUser = userRepository.findByUserName(userName);
-        if(checkUser.isEmpty()){
-            return new ResponseEntity("Username available", HttpStatus.OK);
+        Map<String,Boolean> response = new HashMap<>();
+        try {
+            List<User> checkUser = userRepository.findByUserName(userName);
+            if(checkUser.isEmpty()){
+                response.put("available", true);
+                return ResponseEntity.accepted().body(response);
+            }
+            else{
+                response.put("available", false);
+                return ResponseEntity.badRequest().body(response);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return new ResponseEntity("Username not available" ,HttpStatus.NOT_ACCEPTABLE);
     }
 
     @Override
     public ResponseEntity<User> login(LoginUserDto loginUserDto) {
-        List<User> checkEmail = userRepository.findByEmail(loginUserDto.getEmail());
-        if(!checkEmail.isEmpty()){
-            User user = checkEmail.get(0);
-            boolean checkPassword = passwordEncoder.matches(loginUserDto.getPassword(), user.getPassword());
-            if(checkPassword)   return new ResponseEntity(user, HttpStatus.OK);
-            else    return new ResponseEntity("Invalid Password", HttpStatus.NOT_ACCEPTABLE);
+        try {
+            List<User> checkEmail = userRepository.findByEmail(loginUserDto.getEmail());
+            if(!checkEmail.isEmpty()){
+                User user = checkEmail.get(0);
+                boolean checkPassword = passwordEncoder.matches(loginUserDto.getPassword(), user.getPassword());
+                if(checkPassword)   return new ResponseEntity(user, HttpStatus.OK);
+                else    return new ResponseEntity("Invalid Password", HttpStatus.NOT_ACCEPTABLE);
+            }
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 
 

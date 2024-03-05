@@ -8,7 +8,8 @@ module.exports = {
       'josefin' : ['Josefin sans', 'ui-sans-serif']
     },
     colors:{
-      'primary':'#FFA250'
+      'primary':'#FFA250',
+      'light-orange': '#FFE9D6'
     }
   },
   plugins: [
